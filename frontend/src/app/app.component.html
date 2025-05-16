@@ -1,0 +1,20 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="main-layout">
+  <aside class="sidebar">
+    <h2>Réclamations</h2>
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a routerLink="/clients" routerLinkActive="active">Clients</a></li>
+        <li><a routerLink="/reclamations" routerLinkActive="active">Réclamations</a></li>
+        <!-- Ajoute ici d'autres liens plus tard (agents, suivis) -->
+      </ul>
+    </nav>
+  </aside>
+  <section class="content">
+    <header class="header">
+      <h1>Bienvenue sur la plateforme de gestion des réclamations</h1>
+      <p>Gérez efficacement vos clients, réclamations, agents et suivis.</p>
+    </header>
+    <router-outlet></router-outlet>
+  </section>
+</div>

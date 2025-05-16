@@ -1,0 +1,45 @@
+<div class="container">
+  <h2>Liste des réclamations</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Objet</th>
+        <th>Description</th>
+        <th>Statut</th>
+        <th>Client ID</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let reclamation of reclamations">
+        <td>{{ reclamation.objet }}</td>
+        <td>{{ reclamation.description }}</td>
+        <td>{{ reclamation.statut }}</td>
+        <td>{{ reclamation.clientId }}</td>
+        <td>
+          <button (click)="editReclamation(reclamation)" class="btn btn-sm btn-primary">Modifier</button>
+          <button (click)="deleteReclamation(reclamation.id!)" class="btn btn-sm btn-danger">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 *ngIf="!editMode">Ajouter une réclamation</h3>
+  <h3 *ngIf="editMode">Modifier la réclamation</h3>
+  <form (ngSubmit)="editMode ? updateReclamation() : addReclamation()" #reclamationForm="ngForm">
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Objet" [(ngModel)]="newReclamation.objet" name="objet" required />
+    </div>
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Description" [(ngModel)]="newReclamation.description" name="description" required />
+    </div>
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Statut" [(ngModel)]="newReclamation.statut" name="statut" required />
+    </div>
+    <div class="form-group">
+      <input type="number" class="form-control" placeholder="Client ID" [(ngModel)]="newReclamation.clientId" name="clientId" required />
+    </div>
+    <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+    <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
+  </form>
+</div>

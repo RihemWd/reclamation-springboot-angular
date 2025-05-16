@@ -1,0 +1,40 @@
+<div class="container">
+  <h2>Liste des clients</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let client of clients">
+        <td>{{ client.nom }}</td>
+        <td>{{ client.email }}</td>
+        <td>{{ client.telephone }}</td>
+        <td>
+          <button (click)="editClient(client)" class="btn btn-sm btn-primary">Modifier</button>
+          <button (click)="deleteClient(client.id!)" class="btn btn-sm btn-danger">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 *ngIf="!editMode">Ajouter un client</h3>
+  <h3 *ngIf="editMode">Modifier le client</h3>
+  <form (ngSubmit)="editMode ? updateClient() : addClient()" #clientForm="ngForm">
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Nom" [(ngModel)]="newClient.nom" name="nom" required />
+    </div>
+    <div class="form-group">
+      <input type="email" class="form-control" placeholder="Email" [(ngModel)]="newClient.email" name="email" required />
+    </div>
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Téléphone" [(ngModel)]="newClient.telephone" name="telephone" required />
+    </div>
+    <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+    <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
+  </form>
+</div>
