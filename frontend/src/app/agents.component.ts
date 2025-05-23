@@ -8,7 +8,7 @@ import { AgentSAVService, AgentSAV } from './agent-sav.service';
 })
 export class AgentsComponent implements OnInit {
   agents: AgentSAV[] = [];
-  newAgent: AgentSAV = { nom: '', email: '' };
+  newAgent: AgentSAV = { nom: '', competence: '' };
   editMode: boolean = false;
   selectedAgentId: number | null = null;
 
@@ -25,7 +25,7 @@ export class AgentsComponent implements OnInit {
   addAgent() {
     this.agentService.addAgent(this.newAgent).subscribe(() => {
       this.loadAgents();
-      this.newAgent = { nom: '', email: '' };
+      this.newAgent = { nom: '', competence: '' };
     });
   }
 
@@ -41,7 +41,7 @@ export class AgentsComponent implements OnInit {
         this.loadAgents();
         this.editMode = false;
         this.selectedAgentId = null;
-        this.newAgent = { nom: '', email: '' };
+        this.newAgent = { nom: '', competence: '' };
       });
     }
   }
@@ -53,6 +53,6 @@ export class AgentsComponent implements OnInit {
   cancelEdit() {
     this.editMode = false;
     this.selectedAgentId = null;
-    this.newAgent = { nom: '', email: '' };
+    this.newAgent = { nom: '', competence: '' };
   }
 }

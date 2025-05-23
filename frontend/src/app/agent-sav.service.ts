@@ -5,12 +5,12 @@ import { Observable } from 'rxjs';
 export interface AgentSAV {
   id?: number;
   nom: string;
-  email: string;
+  competence: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AgentSAVService {
-  private apiUrl = 'http://localhost:8080/api/agents';
+  private apiUrl = 'http://localhost:8080/api/agentsav';
 
   constructor(private http: HttpClient) {}
 
