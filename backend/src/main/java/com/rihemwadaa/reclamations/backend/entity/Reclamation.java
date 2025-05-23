@@ -19,6 +19,7 @@ public class Reclamation {
     private String description;
     private Date date;
     private Integer note;
+    private String objet;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -34,4 +35,6 @@ public class Reclamation {
     public void setDate(Date date) { this.date = date; }
     public Integer getNote() { return note; }
     public void setNote(Integer note) { this.note = note; }
+    public String getObjet() { return objet; }
+    public void setObjet(String objet) { this.objet = objet; }
 }
