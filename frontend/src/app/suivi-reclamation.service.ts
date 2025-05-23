@@ -5,9 +5,10 @@ import { Observable } from 'rxjs';
 export interface SuiviReclamation {
   id?: number;
   date: string;
-  commentaire: string;
-  reclamationId: number;
-  agentId: number;
+  message: string;
+  action: string;
+  reclamation: { id: number };
+  agent: { id: number };
 }
 
 @Injectable({ providedIn: 'root' })

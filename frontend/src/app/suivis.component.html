@@ -4,18 +4,20 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Commentaire</th>
-        <th>Réclamation ID</th>
-        <th>Agent ID</th>
+        <th>Message</th>
+        <th>Action</th>
+        <th>Réclamation</th>
+        <th>Agent</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let suivi of suivis">
-        <td>{{ suivi.date }}</td>
-        <td>{{ suivi.commentaire }}</td>
-        <td>{{ suivi.reclamationId }}</td>
-        <td>{{ suivi.agentId }}</td>
+        <td>{{ suivi.date | date:'yyyy-MM-dd' }}</td>
+        <td>{{ suivi.message }}</td>
+        <td>{{ suivi.action }}</td>
+        <td>{{ getReclamationLabel(suivi.reclamation?.id) }}</td>
+        <td>{{ suivi.employe }}</td>
         <td>
           <button (click)="editSuivi(suivi)" class="btn btn-sm btn-primary">Modifier</button>
           <button (click)="deleteSuivi(suivi.id!)" class="btn btn-sm btn-danger">Supprimer</button>
@@ -31,13 +33,22 @@
       <input type="date" class="form-control" placeholder="Date" [(ngModel)]="newSuivi.date" name="date" required />
     </div>
     <div class="form-group">
-      <input type="text" class="form-control" placeholder="Commentaire" [(ngModel)]="newSuivi.commentaire" name="commentaire" required />
+      <input type="text" class="form-control" placeholder="Message" [(ngModel)]="newSuivi.message" name="message" required />
     </div>
     <div class="form-group">
-      <input type="number" class="form-control" placeholder="Réclamation ID" [(ngModel)]="newSuivi.reclamationId" name="reclamationId" required />
+      <input type="text" class="form-control" placeholder="Action" [(ngModel)]="newSuivi.action" name="action" required />
     </div>
     <div class="form-group">
-      <input type="number" class="form-control" placeholder="Agent ID" [(ngModel)]="newSuivi.agentId" name="agentId" required />
+      <select class="form-control" [(ngModel)]="newSuivi.reclamation.id" name="reclamationId" required>
+        <option value="">-- Sélectionner une réclamation --</option>
+        <option *ngFor="let rec of reclamations" [value]="rec.id">{{ rec.objet }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <select class="form-control" [(ngModel)]="newSuivi.agent.id" name="agentId" required>
+        <option value="">-- Sélectionner un agent --</option>
+        <option *ngFor="let ag of agents" [value]="ag.id">{{ ag.nom }} ({{ ag.competence }})</option>
+      </select>
     </div>
     <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
     <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
