@@ -1,35 +1,52 @@
-<div class="container">
-  <h2>Liste des agents SAV</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Compétence</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let agent of agents">
-        <td>{{ agent.nom }}</td>
-        <td>{{ agent.competence }}</td>
-        <td>
-          <button (click)="editAgent(agent)" class="btn btn-sm btn-primary">Modifier</button>
-          <button (click)="deleteAgent(agent.id!)" class="btn btn-sm btn-danger">Supprimer</button>
+<mat-card class="suivis-card">
+  <h2 mat-card-title>Liste des agents SAV</h2>
+  <div class="mat-elevation-z2">
+    <table mat-table [dataSource]="agents" class="mat-table" multiTemplateDataRows>
+      <ng-container matColumnDef="nom">
+        <th mat-header-cell *matHeaderCellDef>Nom</th>
+        <td mat-cell *matCellDef="let agent">{{ agent.nom }}</td>
+      </ng-container>
+      <ng-container matColumnDef="competence">
+        <th mat-header-cell *matHeaderCellDef>Compétence</th>
+        <td mat-cell *matCellDef="let agent">{{ agent.competence }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let agent">
+          <button (click)="editAgent(agent)" class="icon-btn" title="Modifier"><span>✏️</span></button>
+          <button (click)="deleteAgent(agent.id!)" class="icon-btn cancel" title="Supprimer"><span>🗑️</span></button>
         </td>
-      </tr>
-    </tbody>
-  </table>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['nom','competence','actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['nom','competence','actions'];"></tr>
+    </table>
+  </div>
+</mat-card>
 
+<div class="global-alert-container">
+  <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+</div>
+<button class="modern-add-btn add-btn-top" (click)="showForm = !showForm">
+  <span class="add-icon">➕</span> {{ showForm ? 'Fermer le formulaire' : 'Ajouter un agent' }}
+</button>
+<div class="form-card" *ngIf="showForm || editMode">
   <h3 *ngIf="!editMode">Ajouter un agent</h3>
   <h3 *ngIf="editMode">Modifier l'agent</h3>
-  <form (ngSubmit)="editMode ? updateAgent() : addAgent()" #agentForm="ngForm">
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Nom" [(ngModel)]="newAgent.nom" name="nom" required />
+  <form (ngSubmit)="editMode ? updateAgent() : addAgent()" #agentForm="ngForm" class="modern-form">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Nom</label>
+        <input type="text" [(ngModel)]="newAgent.nom" name="nom" required />
+      </div>
+      <div class="form-field">
+        <label>Compétence</label>
+        <input type="text" [(ngModel)]="newAgent.competence" name="competence" required />
+      </div>
     </div>
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Compétence" [(ngModel)]="newAgent.competence" name="competence" required />
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+      <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="icon-btn cancel" title="Annuler"><span>✖️</span></button>
     </div>
-    <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
-    <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
   </form>
 </div>

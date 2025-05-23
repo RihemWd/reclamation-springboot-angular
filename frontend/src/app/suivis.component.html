@@ -1,56 +1,82 @@
-<div class="container">
-  <h2>Liste des suivis de réclamation</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Message</th>
-        <th>Action</th>
-        <th>Réclamation</th>
-        <th>Agent</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let suivi of suivis">
-        <td>{{ suivi.date | date:'yyyy-MM-dd' }}</td>
-        <td>{{ suivi.message }}</td>
-        <td>{{ suivi.action }}</td>
-        <td>{{ getReclamationLabel(suivi.reclamation?.id) }}</td>
-        <td>{{ suivi.employe }}</td>
-        <td>
-          <button (click)="editSuivi(suivi)" class="btn btn-sm btn-primary">Modifier</button>
-          <button (click)="deleteSuivi(suivi.id!)" class="btn btn-sm btn-danger">Supprimer</button>
+<mat-card class="suivis-card">
+  <h2 mat-card-title>Liste des suivis de réclamation</h2>
+  <div class="mat-elevation-z2">
+    <table mat-table [dataSource]="suivis" class="mat-table" multiTemplateDataRows>
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let suivi">{{ suivi.date | date:'yyyy-MM-dd' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="message">
+        <th mat-header-cell *matHeaderCellDef>Message</th>
+        <td mat-cell *matCellDef="let suivi">{{ suivi.message }}</td>
+      </ng-container>
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let suivi">{{ suivi.action }}</td>
+      </ng-container>
+      <ng-container matColumnDef="reclamation">
+        <th mat-header-cell *matHeaderCellDef>Réclamation</th>
+        <td mat-cell *matCellDef="let suivi">{{ getReclamationLabel(suivi.reclamation?.id) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="employe">
+        <th mat-header-cell *matHeaderCellDef>Agent</th>
+        <td mat-cell *matCellDef="let suivi">{{ suivi.employe }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let suivi">
+          <button (click)="editSuivi(suivi)" class="icon-btn" title="Modifier"><span>✏️</span></button>
+          <button (click)="deleteSuivi(suivi.id!)" class="icon-btn cancel" title="Supprimer"><span>🗑️</span></button>
         </td>
-      </tr>
-    </tbody>
-  </table>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['date','message','action','reclamation','employe','actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['date','message','action','reclamation','employe','actions'];"></tr>
+    </table>
+  </div>
+</mat-card>
 
+<div class="global-alert-container">
+  <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+</div>
+<button class="modern-add-btn add-btn-top" (click)="showForm = !showForm">
+  <span class="add-icon">➕</span> {{ showForm ? 'Fermer le formulaire' : 'Ajouter un suivi' }}
+</button>
+<div class="form-card" *ngIf="showForm || editMode">
   <h3 *ngIf="!editMode">Ajouter un suivi</h3>
   <h3 *ngIf="editMode">Modifier le suivi</h3>
-  <form (ngSubmit)="editMode ? updateSuivi() : addSuivi()" #suiviForm="ngForm">
-    <div class="form-group">
-      <input type="date" class="form-control" placeholder="Date" [(ngModel)]="newSuivi.date" name="date" required />
+  <form (ngSubmit)="editMode ? updateSuivi() : addSuivi()" #suiviForm="ngForm" class="modern-form">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="newSuivi.date" name="date" required />
+      </div>
+      <div class="form-field">
+        <label>Message</label>
+        <input type="text" [(ngModel)]="newSuivi.message" name="message" required />
+      </div>
+      <div class="form-field">
+        <label>Action</label>
+        <input type="text" [(ngModel)]="newSuivi.action" name="action" required />
+      </div>
+      <div class="form-field">
+        <label>Réclamation</label>
+        <select [(ngModel)]="newSuivi.reclamation.id" name="reclamationId" required>
+          <option value="">-- Sélectionner une réclamation --</option>
+          <option *ngFor="let rec of reclamations" [value]="rec.id">{{ rec.objet }}</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Agent</label>
+        <select [(ngModel)]="newSuivi.agent.id" name="agentId" required>
+          <option value="">-- Sélectionner un agent --</option>
+          <option *ngFor="let ag of agents" [value]="ag.id">{{ ag.nom }} ({{ ag.competence }})</option>
+        </select>
+      </div>
     </div>
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Message" [(ngModel)]="newSuivi.message" name="message" required />
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+      <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="icon-btn cancel" title="Annuler"><span>✖️</span></button>
     </div>
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Action" [(ngModel)]="newSuivi.action" name="action" required />
-    </div>
-    <div class="form-group">
-      <select class="form-control" [(ngModel)]="newSuivi.reclamation.id" name="reclamationId" required>
-        <option value="">-- Sélectionner une réclamation --</option>
-        <option *ngFor="let rec of reclamations" [value]="rec.id">{{ rec.objet }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <select class="form-control" [(ngModel)]="newSuivi.agent.id" name="agentId" required>
-        <option value="">-- Sélectionner un agent --</option>
-        <option *ngFor="let ag of agents" [value]="ag.id">{{ ag.nom }} ({{ ag.competence }})</option>
-      </select>
-    </div>
-    <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
-    <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
   </form>
 </div>

@@ -15,6 +15,9 @@ export class SuivisComponent implements OnInit {
   newSuivi: any = { date: '', message: '', action: '', reclamation: { id: null }, agent: { id: null } };
   editMode: boolean = false;
   selectedSuiviId: number | null = null;
+  showForm: boolean = false;
+  successMessage: string = '';
+  errorMessage: string = '';
 
   constructor(
     readonly suiviService: SuiviReclamationService,
@@ -33,6 +36,12 @@ export class SuivisComponent implements OnInit {
   }
 
   addSuivi() {
+    if (!this.newSuivi.date || !this.newSuivi.message || !this.newSuivi.action || !this.newSuivi.reclamation.id || !this.newSuivi.agent.id) {
+      this.errorMessage = 'Tous les champs sont obligatoires.';
+      this.successMessage = '';
+      setTimeout(() => this.errorMessage = '', 2500);
+      return;
+    }
     const agentId = Number(this.newSuivi.agent.id);
     const agentObj = this.agents.find(a => a.id === agentId);
     const payload = {
@@ -43,6 +52,10 @@ export class SuivisComponent implements OnInit {
     this.suiviService.addSuivi(payload).subscribe(() => {
       this.loadSuivis();
       this.newSuivi = { date: '', message: '', action: '', reclamation: { id: null }, agent: { id: null } };
+      this.successMessage = 'Suivi ajouté avec succès !';
+      this.errorMessage = '';
+      setTimeout(() => this.successMessage = '', 2500);
+      this.showForm = false;
     });
   }
 
@@ -67,6 +80,12 @@ export class SuivisComponent implements OnInit {
   }
 
   updateSuivi() {
+    if (!this.newSuivi.date || !this.newSuivi.message || !this.newSuivi.action || !this.newSuivi.reclamation.id || !this.newSuivi.agent.id) {
+      this.errorMessage = 'Tous les champs sont obligatoires.';
+      this.successMessage = '';
+      setTimeout(() => this.errorMessage = '', 2500);
+      return;
+    }
     if (this.selectedSuiviId) {
       const agentId = Number(this.newSuivi.agent.id);
       const agentObj = this.agents.find(a => a.id === agentId);
@@ -77,21 +96,38 @@ export class SuivisComponent implements OnInit {
       };
       this.suiviService.updateSuivi(this.selectedSuiviId, payload).subscribe(() => {
         this.loadSuivis();
+        this.successMessage = 'Suivi modifié avec succès !';
+        this.errorMessage = '';
+        setTimeout(() => this.successMessage = '', 2500);
         this.editMode = false;
         this.selectedSuiviId = null;
         this.newSuivi = { date: '', message: '', action: '', reclamation: { id: null }, agent: { id: null } };
+        this.showForm = false;
       });
     }
   }
 
   deleteSuivi(id: number) {
-    this.suiviService.deleteSuivi(id).subscribe(() => this.loadSuivis());
+    this.suiviService.deleteSuivi(id).subscribe({
+      next: () => {
+        this.loadSuivis();
+        this.successMessage = 'Suivi supprimé avec succès !';
+        this.errorMessage = '';
+        setTimeout(() => this.successMessage = '', 2500);
+      },
+      error: () => {
+        this.errorMessage = 'Erreur lors de la suppression du suivi.';
+        this.successMessage = '';
+        setTimeout(() => this.errorMessage = '', 2500);
+      }
+    });
   }
 
   cancelEdit() {
     this.editMode = false;
     this.selectedSuiviId = null;
     this.newSuivi = { date: '', message: '', action: '', reclamation: { id: null }, agent: { id: null } };
+    this.showForm = false;
   }
 
   getReclamationLabel(reclamationId: number): string {

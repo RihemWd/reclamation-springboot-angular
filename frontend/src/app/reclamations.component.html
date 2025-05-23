@@ -1,68 +1,100 @@
-<div class="container">
-  <h2>Liste des réclamations</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Objet</th>
-        <th>Produit</th>
-        <th>Description</th>
-        <th>Statut</th>
-        <th>Date</th>
-        <th>Note</th>
-        <th>Client</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let reclamation of reclamations">
-        <td>{{ reclamation.objet }}</td>
-        <td>{{ reclamation.produit }}</td>
-        <td>{{ reclamation.description }}</td>
-        <td>{{ reclamation.statut }}</td>
-        <td>{{ reclamation.date | date:'yyyy-MM-dd' }}</td>
-        <td>{{ reclamation.note }}</td>
-        <td>{{ getClientName(reclamation.client?.id) }}</td>
-        <td>
-          <button (click)="editReclamation(reclamation)" class="btn btn-sm btn-primary">Modifier</button>
-          <button (click)="deleteReclamation(reclamation.id!)" class="btn btn-sm btn-danger">Supprimer</button>
+<mat-card class="suivis-card">
+  <h2 mat-card-title>Liste des réclamations</h2>
+  <div class="mat-elevation-z2">
+    <table mat-table [dataSource]="reclamations" class="mat-table" multiTemplateDataRows>
+      <ng-container matColumnDef="objet">
+        <th mat-header-cell *matHeaderCellDef>Objet</th>
+        <td mat-cell *matCellDef="let reclamation">{{ reclamation.objet }}</td>
+      </ng-container>
+      <ng-container matColumnDef="produit">
+        <th mat-header-cell *matHeaderCellDef>Produit</th>
+        <td mat-cell *matCellDef="let reclamation">{{ reclamation.produit }}</td>
+      </ng-container>
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let reclamation">{{ reclamation.description }}</td>
+      </ng-container>
+      <ng-container matColumnDef="statut">
+        <th mat-header-cell *matHeaderCellDef>Statut</th>
+        <td mat-cell *matCellDef="let reclamation">{{ reclamation.statut }}</td>
+      </ng-container>
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let reclamation">{{ reclamation.date | date:'yyyy-MM-dd' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="note">
+        <th mat-header-cell *matHeaderCellDef>Note</th>
+        <td mat-cell *matCellDef="let reclamation">{{ reclamation.note }}</td>
+      </ng-container>
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef>Client</th>
+        <td mat-cell *matCellDef="let reclamation">{{ getClientName(reclamation.client?.id) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let reclamation">
+          <button (click)="editReclamation(reclamation)" class="icon-btn" title="Modifier"><span>✏️</span></button>
+          <button (click)="deleteReclamation(reclamation.id!)" class="icon-btn cancel" title="Supprimer"><span>🗑️</span></button>
         </td>
-      </tr>
-    </tbody>
-  </table>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['objet','produit','description','statut','date','note','client','actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['objet','produit','description','statut','date','note','client','actions'];"></tr>
+    </table>
+  </div>
+</mat-card>
 
+<div class="global-alert-container">
+  <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+</div>
+<button class="modern-add-btn add-btn-top" (click)="showForm = !showForm">
+  <span class="add-icon">➕</span> {{ showForm ? 'Fermer le formulaire' : 'Ajouter une réclamation' }}
+</button>
+<div class="form-card" *ngIf="showForm || editMode">
   <h3 *ngIf="!editMode">Ajouter une réclamation</h3>
   <h3 *ngIf="editMode">Modifier la réclamation</h3>
-  <form (ngSubmit)="editMode ? updateReclamation() : addReclamation()" #reclamationForm="ngForm">
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Objet" [(ngModel)]="newReclamation.objet" name="objet" required />
+  <form (ngSubmit)="editMode ? updateReclamation() : addReclamation()" #reclamationForm="ngForm" class="modern-form">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Objet</label>
+        <input type="text" [(ngModel)]="newReclamation.objet" name="objet" required />
+      </div>
+      <div class="form-field">
+        <label>Produit</label>
+        <input type="text" [(ngModel)]="newReclamation.produit" name="produit" required />
+      </div>
+      <div class="form-field">
+        <label>Description</label>
+        <input type="text" [(ngModel)]="newReclamation.description" name="description" required />
+      </div>
+      <div class="form-field">
+        <label>Statut</label>
+        <select [(ngModel)]="newReclamation.statut" name="statut" required>
+          <option value="">-- Statut --</option>
+          <option value="NOUVELLE">Nouvelle</option>
+          <option value="EN_COURS">En cours</option>
+          <option value="RESOLUE">Résolue</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="newReclamation.date" name="date" required />
+      </div>
+      <div class="form-field">
+        <label>Note</label>
+        <input type="number" [(ngModel)]="newReclamation.note" name="note" required />
+      </div>
+      <div class="form-field">
+        <label>Client</label>
+        <select [(ngModel)]="newReclamation.client.id" name="clientId" required>
+          <option value="">-- Sélectionner un client --</option>
+          <option *ngFor="let cl of clients" [value]="cl.id">{{ cl.nom }}</option>
+        </select>
+      </div>
     </div>
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Produit" [(ngModel)]="newReclamation.produit" name="produit" required />
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+      <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="icon-btn cancel" title="Annuler"><span>✖️</span></button>
     </div>
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="Description" [(ngModel)]="newReclamation.description" name="description" required />
-    </div>
-    <div class="form-group">
-      <select class="form-control" [(ngModel)]="newReclamation.statut" name="statut" required>
-        <option value="">-- Statut --</option>
-        <option value="NOUVELLE">Nouvelle</option>
-        <option value="EN_COURS">En cours</option>
-        <option value="RESOLUE">Résolue</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <input type="date" class="form-control" placeholder="Date" [(ngModel)]="newReclamation.date" name="date" required />
-    </div>
-    <div class="form-group">
-      <input type="number" class="form-control" placeholder="Note (1-5)" min="1" max="5" [(ngModel)]="newReclamation.note" name="note" required />
-    </div>
-    <div class="form-group">
-      <select class="form-control" [(ngModel)]="newReclamation.client.id" name="clientId" required>
-        <option value="">-- Sélectionner un client --</option>
-        <option *ngFor="let client of clients" [value]="client.id">{{ client.nom }} ({{ client.email }})</option>
-      </select>
-    </div>
-    <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
-    <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
   </form>
 </div>

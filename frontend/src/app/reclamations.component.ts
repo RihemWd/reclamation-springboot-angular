@@ -21,6 +21,9 @@ export class ReclamationsComponent implements OnInit {
   };
   editMode: boolean = false;
   selectedReclamationId: number | null = null;
+  showForm: boolean = false;
+  successMessage: string = '';
+  errorMessage: string = '';
 
   constructor(
     readonly reclamationService: ReclamationService,
@@ -37,6 +40,12 @@ export class ReclamationsComponent implements OnInit {
   }
 
   addReclamation() {
+    if (!this.newReclamation.objet || !this.newReclamation.produit || !this.newReclamation.description || !this.newReclamation.statut || !this.newReclamation.date || !this.newReclamation.note || !this.newReclamation.client.id) {
+      this.errorMessage = 'Tous les champs sont obligatoires.';
+      this.successMessage = '';
+      setTimeout(() => this.errorMessage = '', 2500);
+      return;
+    }
     // Correction : le client doit être un objet {id: ...}
     this.reclamationService.addReclamation(this.newReclamation).subscribe(() => {
       this.loadReclamations();
@@ -49,6 +58,10 @@ export class ReclamationsComponent implements OnInit {
         note: 1,
         client: { id: null }
       };
+      this.successMessage = 'Réclamation ajoutée avec succès !';
+      this.errorMessage = '';
+      setTimeout(() => this.successMessage = '', 2500);
+      this.showForm = false;
     });
   }
 
@@ -74,9 +87,18 @@ export class ReclamationsComponent implements OnInit {
   }
 
   updateReclamation() {
+    if (!this.newReclamation.objet || !this.newReclamation.produit || !this.newReclamation.description || !this.newReclamation.statut || !this.newReclamation.date || !this.newReclamation.note || !this.newReclamation.client.id) {
+      this.errorMessage = 'Tous les champs sont obligatoires.';
+      this.successMessage = '';
+      setTimeout(() => this.errorMessage = '', 2500);
+      return;
+    }
     if (this.selectedReclamationId) {
       this.reclamationService.updateReclamation(this.selectedReclamationId, this.newReclamation).subscribe(() => {
         this.loadReclamations();
+        this.successMessage = 'Réclamation modifiée avec succès !';
+        this.errorMessage = '';
+        setTimeout(() => this.successMessage = '', 2500);
         this.editMode = false;
         this.selectedReclamationId = null;
         this.newReclamation = {
@@ -88,12 +110,25 @@ export class ReclamationsComponent implements OnInit {
           note: 1,
           client: { id: null }
         };
+        this.showForm = false;
       });
     }
   }
 
   deleteReclamation(id: number) {
-    this.reclamationService.deleteReclamation(id).subscribe(() => this.loadReclamations());
+    this.reclamationService.deleteReclamation(id).subscribe({
+      next: () => {
+        this.loadReclamations();
+        this.successMessage = 'Réclamation supprimée avec succès !';
+        this.errorMessage = '';
+        setTimeout(() => this.successMessage = '', 2500);
+      },
+      error: () => {
+        this.errorMessage = 'Erreur lors de la suppression de la réclamation.';
+        this.successMessage = '';
+        setTimeout(() => this.errorMessage = '', 2500);
+      }
+    });
   }
 
   cancelEdit() {
@@ -108,6 +143,7 @@ export class ReclamationsComponent implements OnInit {
       note: 1,
       client: { id: null }
     };
+    this.showForm = false;
   }
 
   getClientName(clientId: number): string {
