@@ -1,0 +1,35 @@
+<div class="container">
+  <h2>Liste des agents SAV</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let agent of agents">
+        <td>{{ agent.nom }}</td>
+        <td>{{ agent.email }}</td>
+        <td>
+          <button (click)="editAgent(agent)" class="btn btn-sm btn-primary">Modifier</button>
+          <button (click)="deleteAgent(agent.id!)" class="btn btn-sm btn-danger">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 *ngIf="!editMode">Ajouter un agent</h3>
+  <h3 *ngIf="editMode">Modifier l'agent</h3>
+  <form (ngSubmit)="editMode ? updateAgent() : addAgent()" #agentForm="ngForm">
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Nom" [(ngModel)]="newAgent.nom" name="nom" required />
+    </div>
+    <div class="form-group">
+      <input type="email" class="form-control" placeholder="Email" [(ngModel)]="newAgent.email" name="email" required />
+    </div>
+    <button type="submit" class="btn btn-success">{{ editMode ? 'Mettre à jour' : 'Ajouter' }}</button>
+    <button *ngIf="editMode" type="button" (click)="cancelEdit()" class="btn btn-secondary ml-2">Annuler</button>
+  </form>
+</div>

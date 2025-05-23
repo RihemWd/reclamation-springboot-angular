@@ -37,12 +37,22 @@ export class ClientsComponent implements OnInit {
 
   updateClient() {
     if (this.selectedClientId) {
-      this.clientService.updateClient(this.selectedClientId, this.newClient).subscribe(() => {
-        this.loadClients();
-        this.editMode = false;
-        this.selectedClientId = null;
-        this.newClient = { nom: '', email: '', telephone: '' };
-      });
+      console.log('Updating client with ID:', this.selectedClientId);
+      console.log('Client data:', this.newClient);
+
+      this.clientService.updateClient(this.selectedClientId, this.newClient).subscribe(
+        (response) => {
+          console.log('Update successful:', response);
+          this.loadClients();
+          this.editMode = false;
+          this.selectedClientId = null;
+          this.newClient = { nom: '', email: '', telephone: '' };
+        },
+        (error) => {
+          console.error('Error updating client:', error);
+          alert('Erreur lors de la mise à jour du client: ' + (error.message || 'Erreur inconnue'));
+        }
+      );
     }
   }
 
